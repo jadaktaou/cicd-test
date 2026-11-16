@@ -1,25 +1,30 @@
-name: Data Pipeline Testing (Python)
+name: Snowflake Deployment Pipeline
 
 on: 
   push:
     branches: [ "main" ]
 
 jobs:
-  test-integridad:
+  deploy-to-snowflake:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Descargar código del repositorio
+      - name: 📥 1. Descargar el código
         uses: actions/checkout@v4
 
-      - name: 🐍 Instalar Python 3.10
+      - name: 🐍 2. Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: 🔬 Ejecutar Test de Integridad GxP (ALCOA+)
-        run: python test_procesador.py
+      - name: 📦 3. Instalar conector de Snowflake
+        # Instalamos la librería oficial para que Python pueda hablar con Snowflake
+        run: pip install snowflake-connector-python
 
-      - name: 🚀 Desplegar en Producción
-        # Este paso SOLO se ejecutará si el paso anterior no dio error
-        run: echo "Tests pasados. Desplegando en la nube de Roche."
+      - name: 🚀 4. Conectar y Desplegar (Inyección de Secretos)
+        # Aquí ocurre la magia: Inyectamos los secretos de forma segura
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SF_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
+        run: python deploy_snowflake.py
