@@ -1,19 +1,25 @@
-name: Clinical Data Quality Pipeline
+name: Data Pipeline Testing (Python)
 
 on: 
   push:
     branches: [ "main" ]
 
 jobs:
-  compliance-check:
+  test-integridad:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: 📥 1. Descargar el código del repositorio
+      - name: 📥 Descargar código del repositorio
         uses: actions/checkout@v4
 
-      - name: 🔍 2. Simular test de integridad de datos (ALCOA+)
-        run: echo "Verificando reglas de trazabilidad y prevención de pérdida de datos... ¡Validación superada!"
+      - name: 🐍 Instalar Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-      - name: 🚀 3. Autorizar despliegue
-        run: echo "El código cumple la normativa GxP. Aprobado para despliegue en entorno de Producción."
+      - name: 🔬 Ejecutar Test de Integridad GxP (ALCOA+)
+        run: python test_procesador.py
+
+      - name: 🚀 Desplegar en Producción
+        # Este paso SOLO se ejecutará si el paso anterior no dio error
+        run: echo "Tests pasados. Desplegando en la nube de Roche."
